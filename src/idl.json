@@ -1,0 +1,244 @@
+{
+  "version": "0.1.0",
+  "name": "sol_social",
+  "instructions": [
+    {
+      "name": "newUser",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "new_user_account"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "username",
+          "type": "string"
+        },
+        {
+          "name": "status",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "updateUsername",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "new_user_account"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "user"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "username",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "updateStatus",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "new_user_account"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "user"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "status",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "addBookmarks",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "userAccount",
+          "isMut": true,
+          "isSigner": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "type": "string",
+                "value": "new_user_account"
+              },
+              {
+                "kind": "account",
+                "type": "publicKey",
+                "path": "user"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "bookmark",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "sendPost",
+      "accounts": [
+        {
+          "name": "post",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "author",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "content",
+          "type": "string"
+        },
+        {
+          "name": "username",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Post",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "author",
+            "type": "publicKey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "content",
+            "type": "string"
+          },
+          {
+            "name": "username",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "User",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "publicKey"
+          },
+          {
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "bookmarks",
+            "type": {
+              "vec": "u32"
+            }
+          },
+          {
+            "name": "status",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "address": "7CuooyeTewXB5v3V22gmkoZFKDBdFmkb68mhozGghcxt"
+  }
+}
