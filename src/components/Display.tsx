@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
 interface DisplayInfoProps {
-    newUserAccount: (username: any ) => void;
+    getDetails: (username: string ) => void;
 }
 
-function Display({newUserAccount}: DisplayInfoProps): JSX.Element {
+function Display({getDetails}: DisplayInfoProps): JSX.Element {
     const [username, setUsername] = useState('');
     const [status, setStatus] = useState('');
     return (

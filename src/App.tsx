@@ -4,8 +4,10 @@ import { WalletModalProvider, WalletMultiButton } from '@solana/wallet-adapter-r
 import {  PhantomWalletAdapter,  SolflareWalletAdapter, } from '@solana/wallet-adapter-wallets';
 import { Program, web3, BN, Provider, AnchorProvider, } from '@project-serum/anchor';
 import { clusterApiUrl, Connection } from '@solana/web3.js';
-import React, { FC, ReactNode, useMemo, useEffect, useRef, useState } from 'react';
+import React, { FC, ReactNode, useMemo, useEffect, useRef, useState, Fragment } from 'react';
 import idl from './idl.json'
+import Home from './components/Home';
+import Display from './components/Display';
 import Signup from './components/Signup';
 import NewStatus from './components/NewStatus';
 import NewUsername from './components/NewUsername';
@@ -90,7 +92,7 @@ const Content: FC = () => {
     program.programId
     );
     
-    console.log("newUserPDA", newUserPDA);
+    // console.log("newUserPDA", newUserPDA);
     await program.methods.newUser(username, "Hi I'm new here").accounts({
       userAccount: newUserPDA,
       systemProgram: anchor.web3.SystemProgram.programId,
@@ -98,7 +100,7 @@ const Content: FC = () => {
     .rpc();
     const newUserAccount = await program.account.user.fetch(newUserPDA);
     setIsAccount(true);
-     console.log(newUserAccount);
+    console.log(newUserAccount);
 }
 
    
@@ -120,16 +122,18 @@ const Content: FC = () => {
         program.programId
         );
         
-        console.log("newUserPDA", newUserPDA);
+        // console.log("newUserPDA", newUserPDA);
         await program.methods.updateUsername(username).accounts({
           userAccount: newUserPDA,
           systemProgram: anchor.web3.SystemProgram.programId,
         })
         .rpc();
-        const newUserAccount = await program.account.user.fetch(newUserPDA);
+        // const newUserAccount = await program.account.user.fetch(newUserPDA);
         setIsAccount(true);
-        console.log(newUserAccount); 
-         
+        // console.log(newUserAccount.username);
+        // console.log(newUserAccount.status) 
+        // console.log(newUserAccount); 
+         getDetails();
     }
 
     async function UpdateStatus(status: string) {
@@ -157,12 +161,41 @@ const Content: FC = () => {
             systemProgram: anchor.web3.SystemProgram.programId,
         })
         .rpc();
-        const newUserAccount = await program.account.user.fetch(newUserPDA);
-        console.log(newUserAccount);  
+        // const newUserAccount = await program.account.user.fetch(newUserPDA);
+        // console.log(newUserAccount.username);
+        // console.log(newUserAccount.status);  
+        getDetails();
     }
+
+    const  getDetails = async () => {
+        const provider = getProvider()
+            
+        if (!provider) {
+            throw("Provider is null!!!");
+            }
+            
+        const a = JSON.stringify(idl);
+        const b = JSON.parse(a);
+        const program = new Program(b, idl.metadata.address, provider);
+        const publicKey = provider.wallet.publicKey;
+        const [newUserPDA] = await anchor.web3.PublicKey.findProgramAddress([
+            utf8.encode('new_user_account'),
+            publicKey.toBuffer(),
+        ],
+        program.programId
+        );
+        const res = await program.account.user.fetch(newUserPDA);
+        console.log(res.username);
+
+        console.log(res.status);
+    
+    }
+
+    
     // console.log(isAccount);
     if (!isAccount) {
         return (
+            
             <div style={{background: "#222222"}} className="App">
                 <div>
                 <Signup signupUsername={NewUser} />
@@ -173,10 +206,14 @@ const Content: FC = () => {
             </div>
         );
     }; 
+   
     return (
         <div style={{background: "#222222"}} className="App">
+            {/* <Display getDetails={getDetails} /> */}
+            
             <div style={{}}>
                 {/* <Signup signupUsername={NewUser} /> */}
+                {/* <Display newUserAccount={getDetails} /> */}
                 <NewUsername updateUsername={UpdateUsername} />
                 <NewStatus updateStatus={UpdateStatus} />
                 {/* <NewUsername updateUsername={UpdateUsername} /> */}
@@ -185,27 +222,3 @@ const Content: FC = () => {
         </div>
     );   
 };
-
-
-
- // const provider = getProvider()
-        // if (!provider) {
-        //     throw("Provider is null!!!");
-        // }
-    
-        // const a = JSON.stringify(idl);
-        // const b = JSON.parse(a);
-        // const program = new Program(b, idl.metadata.address, provider);
-        
-        //     await program.methods.newUser("new user", "just joined sol social").accounts({
-        //         userAccount: baseAccount.publicKey,
-        //         systemProgram: web3.SystemProgram.programId,
-        //     })
-        //     .rpc();
-        //     const newAccount = await program.account.userAccount.fetch(baseAccount.publicKey);
-        //     console.log('account: ', newAccount);
-       
-       
-        {/* <button onClick={NewUser}>New User</button> */}
-            {/* <button onClick={UpdateUsername}>Update Username</button> */}
-            {/* <button onClick={UpdateStatus}>Update Status</button> */}
