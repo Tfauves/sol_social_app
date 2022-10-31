@@ -8,6 +8,7 @@ import React, { FC, ReactNode, useMemo, useEffect, useRef, useState, Fragment } 
 import idl from './idl.json'
 import Home from './components/Home';
 import Display from './components/Display';
+import SendPost from './components/Post';
 import Signup from './components/Signup';
 import NewStatus from './components/NewStatus';
 import NewUsername from './components/NewUsername';
@@ -57,7 +58,7 @@ const Context: FC<{ children: ReactNode }> = ({ children }) => {
 
 const Content: FC = () => {
     const wallet = useAnchorWallet();
-    const baseAccount = web3.Keypair.generate();
+    const postAccount = web3.Keypair.generate();
     let [isAccount, setIsAccount] = useState(false);
 
     function getProvider() {
@@ -167,6 +168,31 @@ const Content: FC = () => {
         getDetails();
     }
 
+    async function SendAPost() {
+        const provider = getProvider()
+        if(!provider) {
+            throw("Provider is null!!!");
+        }
+        const a = JSON.stringify(idl);
+        const b = JSON.parse(a);
+        const program = new Program(b, idl.metadata.address, provider);
+        const publicKey = provider.wallet.publicKey;
+
+        await program.methods.sendPost("this post", "jasper").accounts(
+            {
+                post: postAccount.publicKey,
+                author: provider.publicKey
+            },
+        )
+        .signers([postAccount])
+        .rpc();
+
+        const newPostAccount = await program.account.post.fetch(postAccount.publicKey);
+        console.log(newPostAccount);
+
+
+    }
+
     const  getDetails = async () => {
         const provider = getProvider()
             
@@ -216,9 +242,15 @@ const Content: FC = () => {
                 {/* <Display newUserAccount={getDetails} /> */}
                 <NewUsername updateUsername={UpdateUsername} />
                 <NewStatus updateStatus={UpdateStatus} />
+                {/* <SendPost newPost={SendAPost} /> */}
                 {/* <NewUsername updateUsername={UpdateUsername} /> */}
+                <button onClick={SendAPost} className='btn btn-outline-secondary my-3' type='submit'>post something</button>
                 <WalletMultiButton />
             </div>
         </div>
     );   
 };
+
+
+// the first 8 bytes of the account data are where the discriminator are stored, 
+// so either you're passing in the wrong account or maybe the account isn't initialized
