@@ -59,7 +59,7 @@ const Context: FC<{ children: ReactNode }> = ({ children }) => {
 const Content: FC = () => {
     const wallet = useAnchorWallet();
     const postAccount = web3.Keypair.generate();
-    let [isAccount, setIsAccount] = useState(false);
+    // let [isAccount, setIsAccount] = useState(false);
 
     function getProvider() {
 
@@ -92,15 +92,15 @@ const Content: FC = () => {
     ],
     program.programId
     );
-    
-    // console.log("newUserPDA", newUserPDA);
+
+    console.log("newUserPDA", newUserPDA.toBase58());
     await program.methods.newUser(username, "Hi I'm new here").accounts({
       userAccount: newUserPDA,
       systemProgram: anchor.web3.SystemProgram.programId,
     })
     .rpc();
     const newUserAccount = await program.account.user.fetch(newUserPDA);
-    setIsAccount(true);
+    // setIsAccount(true);
     console.log(newUserAccount);
 }
 
@@ -129,12 +129,12 @@ const Content: FC = () => {
           systemProgram: anchor.web3.SystemProgram.programId,
         })
         .rpc();
-        // const newUserAccount = await program.account.user.fetch(newUserPDA);
-        setIsAccount(true);
-        // console.log(newUserAccount.username);
-        // console.log(newUserAccount.status) 
-        // console.log(newUserAccount); 
-         getDetails();
+        const newUserAccount = await program.account.user.fetch(newUserPDA);
+        // setIsAccount(true);
+        console.log(newUserAccount.username);
+        console.log(newUserAccount.status) 
+        console.log(newUserAccount); 
+        //  getDetails();
     }
 
     async function UpdateStatus(status: string) {
@@ -155,20 +155,21 @@ const Content: FC = () => {
         program.programId
         );
             
-        console.log("newUserPDA", newUserPDA);
+        console.log("newUserPDA", newUserPDA.toBase58());
         
         await program.methods.updateStatus(status).accounts({
             userAccount: newUserPDA,
             systemProgram: anchor.web3.SystemProgram.programId,
         })
         .rpc();
-        // const newUserAccount = await program.account.user.fetch(newUserPDA);
-        // console.log(newUserAccount.username);
-        // console.log(newUserAccount.status);  
-        getDetails();
+        const newUserAccount = await program.account.user.fetch(newUserPDA);
+        console.log(newUserAccount.username);
+        console.log(newUserAccount.status); 
+        console.log(newUserAccount.timestamp.toString()); 
+        // getDetails();
     }
 
-    async function SendAPost() {
+    async function SendAPost(content: string) {
         const provider = getProvider()
         if(!provider) {
             throw("Provider is null!!!");
@@ -178,7 +179,7 @@ const Content: FC = () => {
         const program = new Program(b, idl.metadata.address, provider);
         const publicKey = provider.wallet.publicKey;
 
-        await program.methods.sendPost("this post", "jasper").accounts(
+        await program.methods.sendPost(content, "usernam").accounts(
             {
                 post: postAccount.publicKey,
                 author: provider.publicKey
@@ -193,58 +194,56 @@ const Content: FC = () => {
 
     }
 
-    const  getDetails = async () => {
-        const provider = getProvider()
+    // const  getDetails = async () => {
+    //     const provider = getProvider()
             
-        if (!provider) {
-            throw("Provider is null!!!");
-            }
+    //     if (!provider) {
+    //         throw("Provider is null!!!");
+    //         }
             
-        const a = JSON.stringify(idl);
-        const b = JSON.parse(a);
-        const program = new Program(b, idl.metadata.address, provider);
-        const publicKey = provider.wallet.publicKey;
-        const [newUserPDA] = await anchor.web3.PublicKey.findProgramAddress([
-            utf8.encode('new_user_account'),
-            publicKey.toBuffer(),
-        ],
-        program.programId
-        );
-        const res = await program.account.user.fetch(newUserPDA);
-        console.log(res.username);
+    //     const a = JSON.stringify(idl);
+    //     const b = JSON.parse(a);
+    //     const program = new Program(b, idl.metadata.address, provider);
+    //     const publicKey = provider.wallet.publicKey;
+    //     const [newUserPDA] = await anchor.web3.PublicKey.findProgramAddress([
+    //         utf8.encode('new_user_account'),
+    //         publicKey.toBuffer(),
+    //     ],
+    //     program.programId
+    //     );
+    //     const res = await program.account.user.fetch(newUserPDA);
+    //     console.log(res.username);
 
-        console.log(res.status);
+    //     console.log(res.status);
     
-    }
+    // }
 
     
     // console.log(isAccount);
-    if (!isAccount) {
-        return (
+    // if (!isAccount) {
+    //     return (
             
-            <div style={{background: "#222222"}} className="App">
-                <div>
-                <Signup signupUsername={NewUser} />
-                <NewUsername updateUsername={UpdateUsername} />
+    //         <div style={{background: "#222222"}} className="App">
+    //             <div>
+    //             <Signup signupUsername={NewUser} />
+    //             <NewUsername updateUsername={UpdateUsername} />
 
-                <WalletMultiButton />
-                </div>
-            </div>
-        );
-    }; 
+    //             <WalletMultiButton />
+    //             </div>
+    //         </div>
+    //     );
+    // }; 
    
     return (
         <div style={{background: "#222222"}} className="App">
             {/* <Display getDetails={getDetails} /> */}
-            
             <div style={{}}>
-                {/* <Signup signupUsername={NewUser} /> */}
+                <Signup signupUsername={NewUser} />
                 {/* <Display newUserAccount={getDetails} /> */}
                 <NewUsername updateUsername={UpdateUsername} />
                 <NewStatus updateStatus={UpdateStatus} />
-                {/* <SendPost newPost={SendAPost} /> */}
+                <SendPost newPost={SendAPost} />
                 {/* <NewUsername updateUsername={UpdateUsername} /> */}
-                <button onClick={SendAPost} className='btn btn-outline-secondary my-3' type='submit'>post something</button>
                 <WalletMultiButton />
             </div>
         </div>
